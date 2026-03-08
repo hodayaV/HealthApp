@@ -1,0 +1,34 @@
+﻿@page "/goals"
+@using HealthApp.Components.Data
+
+
+@inject IConnectivity ConnectivityService
+
+<div class="content-padding">
+<h3>Update your's Goals</h3>
+
+
+@if (GService.Goals == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<ul>
+		@foreach (var goal in GService.Goals)
+		{
+			<input type="checkbox" @bind="goal.IsActive" id="@goal" name="@goal" />
+			<label for="@goal">@goal.Name </label>
+			<br />
+		}
+		<button @onclick="Save"> Save</button>
+	</ul>
+
+}
+</div>
+@code {
+	GoalService GService = GoalService.INSTANCE;
+	//GoalService GService = Home.GService;
+
+	void Save() => GService.Save();
+}

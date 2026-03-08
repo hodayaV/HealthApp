@@ -1,0 +1,95 @@
+﻿@page "/whatDidIEat"
+@using HealthApp.Components.Data
+
+@inject IConnectivity ConnectivityService
+<div class="content-padding">
+	<h3>What did you eat today</h3>
+	<ul>
+		<em>
+			you drank @FTService.NumGlassBeforNumOfDays(0) glass of water
+		</em>
+		<br />
+		<button @onclick="DrenkWater">Glass of water</button>
+		<br />
+		<br />
+		@foreach (var foodItem in FTService.FoodsBeforeNumOfDays(0))
+		{
+			<p>
+				@FService.FoodTodayString(foodItem)
+			</p>
+		}
+
+	</ul>
+	<ul>
+		<input type="text" @bind="SearchTerm" placeholder="Search..." />
+		<select id="select-state" @bind="NewFoodItem">
+			<option value="" disabled selected> clik for choose</option>
+			@foreach (var food in FilteredFoodItems)
+			{
+				<option value=@food.Id> @food.Name</option>
+			}
+		</select>
+		<input type="text" placeholder="Amount in gram" @bind="Amount" />
+
+		<br />
+
+
+		<button @onclick="AddFoodItem"> Add </button>
+		<button @onclick="Save"> Save</button>
+	</ul>
+</div>
+
+
+@code {
+
+	FoodTodayService FTService = FoodTodayService.INSTANCE;
+	//FoodTodayService FTService = Home.FTService;
+	FoodService FService = FoodService.INSTANCE;
+	//FoodService FService = Home.FService;
+	string NewFoodItem = "";
+	string? Amount;
+	private string SearchTerm = string.Empty;
+	//int NumOfWaterGlass;
+	private IEnumerable<FoodItem> FilteredFoodItems => FService.Foods
+			.Where(item => item.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+			.ToList();
+
+	void DrenkWater() => FTService.AddGlassOfWater();
+	void Save() => FTService.Save();
+	// void OnSelect(ChangeEventArgs e)
+	// {
+	// 	NewFoodItem = e.Value.ToString();
+	// }
+	async void AddFoodItem()
+	{
+		int? foodId = StringToIntOrNull(NewFoodItem);
+		int? amountInt = StringToIntOrNull(Amount);
+		if (foodId == null || amountInt == null || amountInt <= 0)
+		{
+			await Application.Current.MainPage.DisplayAlert("Add", $"Please select eat item and enter an amount bigger than 0", "OK");
+			return;
+		}
+		FTService.AddFood((int)foodId, (int)amountInt);
+		Reset();
+	}
+	void Reset()
+	{
+		SearchTerm = string.Empty;
+		NewFoodItem = "";
+		Amount = null;
+	}
+	int? StringToIntOrNull(string? num) => MyService<MyProfileService>.StringToIntOrNull(num);
+	// {
+	// 	MyService<MyProfileService>.StringToIntOrNull(num);
+	// 	int? myInt = null;
+	// 	if (num != null)
+	// 	{
+	// 		try
+	// 		{
+	// 			myInt = Int32.Parse(num);
+	// 		}
+	// 		catch { }
+	// 	}
+	// 	return myInt;
+	// }
+}

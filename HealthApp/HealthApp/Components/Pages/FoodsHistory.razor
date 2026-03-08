@@ -1,0 +1,141 @@
+﻿@page "/foodshistory"
+@using HealthApp.Components.Data
+@using System;
+@using System.Collections.Generic;
+@using System.ComponentModel;
+@using System.Data;
+@using System.Drawing;
+@using System.Linq;
+@using System.Text;
+@using System.Threading.Tasks;
+
+
+
+
+@inject IConnectivity ConnectivityService
+<div class="content-padding">
+<h3>Foods history</h3>
+<ul>
+	<select @onchange="@OnSelectDay">
+		@for (int i = -1; i < 30; i++)
+		{
+			<option value=@i> @StringForDay(i)  </option>
+		}
+	</select>
+	<br />
+	@if (FoodsForDay.Count > 0)
+	{
+		@foreach (var foodItem in FoodsForDay)
+		{
+			<li @onclick="() => ShowDetails(foodItem)">
+				@FoodTodayString(foodItem)
+			</li>
+		}
+		<br />
+		<em> @Water() </em>
+		 <br />
+		 <br />
+		<h6>Your total nutritional values ​​from @StringForDay(BeforeNumDay) :</h6>
+		<em>	@Energy		</em>
+			<br />
+		<em>	@Fat	</em>
+			<br />
+		<em>	@Pro	</em>
+			<br />
+		<em>	@Carbo	</em>
+			<br />
+		<em>	@Sodium	</em>
+			<br />
+		<em>	@Sugars		</em>
+
+	}
+</ul>
+</div>
+@code {
+	FoodService FService = FoodService.INSTANCE;
+	//FoodService FService = Home.FService;
+	FoodTodayService FTService = FoodTodayService.INSTANCE;
+	//FoodTodayService FTService = Home.FTService;
+	//MyProfileService MPService = Home.MPService;
+	int BeforeNumDay = -1;
+	List<FoodToday> FoodsForDay = new List<FoodToday>();
+	string Pro = "", Fat = "", Carbo = "", Energy = "", Sodium = "", Sugars = "";
+	protected override async Task OnInitializedAsync()  //loding the valu that saved in the laste time
+	{
+		await base.OnInitializedAsync();
+		FTService.OnChange += UpdateState;
+	}
+	private void UpdateState()
+	{
+		FoodsForDay = FTService.FoodsBeforeNumOfDays(BeforeNumDay);
+		FoodsValueString();
+		InvokeAsync(StateHasChanged);
+
+	}
+	public void Dispose()
+	{
+		FTService.OnChange -= UpdateState;
+	}
+	void OnSelectDay(ChangeEventArgs e)
+	{
+		BeforeNumDay = MyService<FoodService>.StringToInt(e.Value);
+		FoodsForDay = FTService.FoodsBeforeNumOfDays(BeforeNumDay);
+		FoodsValueString();
+	}
+	void FoodsValueString()
+	{
+		var foodsValus = FService.SumFoodsValues(FoodsForDay);
+		Pro = MyService<FoodService>.ProString(foodsValus.sumPro);
+		Fat = MyService<FoodService>.FatString(foodsValus.sumFat);
+		Carbo = MyService<FoodService>.CarboString(foodsValus.sumCarbo);
+		Energy = MyService<FoodService>.EnergyString(foodsValus.sumEnergy);
+		Sodium = MyService<FoodService>.SodiumString(foodsValus.sumSodium);
+		Sugars = MyService<FoodService>.SugarsString(foodsValus.sumSugars);
+	}
+	// void CalculatFoodsValue()
+	// {
+	// 	var foodsValus = FService.SumFoodsValues(FoodsForDay);
+	// 	Pro = foodsValus.sumPro;
+	// 	Fat = foodsValus.sumFat;
+	// 	Carbo = foodsValus.sumCarbo;
+	// 	Energy = foodsValus.sumEnergy;
+	// 	Sodium = foodsValus.sumSodium;
+	// 	Sugars = foodsValus.sumSugars;
+	// }
+	// int StringToInt(object? obj)
+	// {
+	// 	int num = -1;
+	// 	if (obj != null && obj.ToString() != null)
+	// 	{
+	// 		try
+	// 		{
+	// 			num = Int32.Parse(obj.ToString());
+	// 		}
+	// 		catch { }
+	// 	}
+	// 	return num;
+	// }
+	string Water()
+	{
+		int numOfGlass = FTService.NumGlassBeforNumOfDays(BeforeNumDay);
+		return "you drank " + numOfGlass + " glass of water.";
+	}
+	string StringForDay(int day)
+	{
+		if (day == -1) { return "click for chose"; }
+		if (day == 0) { return "today"; }
+		if (day == 1) { return "yesterday"; }
+		else { return day + "  days ago"; }
+	}
+	string FoodTodayString(FoodToday food) => FService.FoodTodayString(food);
+	async void ShowDetails(FoodToday food)
+	{
+		await Application.Current.MainPage.DisplayAlert(FoodTitleForAmount(food), FoodDetailsString(food), "OK");
+	}
+	string FoodDetailsString(FoodToday food) => FService.FoodDetailsString(food);
+	string FoodTitleForAmount(FoodToday food) => FService.FoodTitleForAmount(food);
+
+	//public void Refresh() { }
+	// its work only if do sumthing in the page/ even if its nothing
+
+}

@@ -1,0 +1,64 @@
+﻿@using HealthApp.Components.Data
+@if (IsOpen)
+{
+    <div class="addFood" >
+        <div class="addFood-content">
+            <span class="close" @onclick="Close">&times;</span>
+            <h5>add new food. values per 100 g</h5>
+            <EditForm Model="Food" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div>
+                    <label for="name">name:</label>
+                    <InputText id="name" @bind-Value="Food.Name" />
+                    <label for="energy">energy(cal):</label>
+                    <InputNumber id="energy" @bind-Value="Food.Energy" /> 
+                </div>
+                <div>
+                    <label for="protein">protein(g):</label>
+                    <InputNumber id="protein" @bind-Value="Food.Protein" />
+              
+                    <label for="fat">total fat(g):</label>
+                    <InputNumber id="fat" @bind-Value="Food.Total_fat" />
+                </div>
+                <div>
+                    <label for="carbo">carbohydrates(g):</label>
+                    <InputNumber id="carbo" @bind-Value="Food.Carbohydrates" />
+                
+                    <label for="sugars">total sugars(g):</label>
+                    <InputNumber id="sugars" @bind-Value="Food.Total_sugars" />
+                </div>
+                <div>
+                    <label for="sodium">sodium(mg):</label>
+                    <InputNumber id="sodium" @bind-Value="Food.Sodium" />
+               
+                <button type="submit">add</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+    //FoodService FService = Home.FService;
+    FoodService FService = FoodService.INSTANCE;
+    private FoodItem Food = new FoodItem();
+    private void Close()
+    {
+        IsOpenChanged.InvokeAsync(false);
+    }
+    private async Task HandleValidSubmit()
+    {
+            Food.Id = FService.GetFreeId();
+            FService.AddPersonalFood(Food);
+            FService.SaveItems();
+            await Application.Current.MainPage.DisplayAlert("Add", $"add food successful", "OK");
+            Food = new FoodItem();
+            Close();
+    }
+}

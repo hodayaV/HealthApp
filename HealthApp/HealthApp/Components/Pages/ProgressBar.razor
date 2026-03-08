@@ -1,0 +1,31 @@
+﻿<div style="height: 4px;"></div>
+<h5>
+    @Target target
+
+    <div style="border: 1px solid #ccc; width: min(90%, 400px); height: 15px; background-color: #8fb9bc; border-radius: 15px;">
+        <div style="width: @(CalcolatePercent())%; height: 100%; background-color: #4d7c80; border-radius: 15px;"></div>
+    </div>
+</h5>
+<em>
+    @TargetString
+</em>
+<div style="height: 4px;"></div>
+
+@code {
+    [Parameter]
+    public double Value { get; set; } = 0;
+    [Parameter]
+    public double Max { get; set; } = 100;
+    [Parameter]
+    public string Target { get; set; } = "";
+    [Parameter]
+    public string TargetString { get; set; } = "";
+
+    private double CalcolatePercent()
+    {
+        double num = (Value * 100 / Max); // get the Percent
+        if (num <= 100) { return num; }
+        return 100;
+    }
+
+}

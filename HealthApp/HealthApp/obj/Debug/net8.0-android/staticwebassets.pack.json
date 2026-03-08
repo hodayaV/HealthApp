@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\hd122\\OneDrive\\Desktop\\project\\HealthApp\\HealthApp\\HealthApp\\obj\\Debug\\net8.0-android\\scopedcss\\bundle\\HealthApp.styles.css",
+      "PackagePath": "staticwebassets\\HealthApp.styles.css"
+    },
+    {
+      "Id": "C:\\Users\\hd122\\OneDrive\\Desktop\\project\\HealthApp\\HealthApp\\HealthApp\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\hd122\\OneDrive\\Desktop\\project\\HealthApp\\HealthApp\\HealthApp\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\hd122\\OneDrive\\Desktop\\project\\HealthApp\\HealthApp\\HealthApp\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\hd122\\OneDrive\\Desktop\\project\\HealthApp\\HealthApp\\HealthApp\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "C:\\Users\\hd122\\OneDrive\\Desktop\\project\\HealthApp\\HealthApp\\HealthApp\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0-android\\staticwebassets\\msbuild.HealthApp.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0-android\\staticwebassets\\msbuild.build.HealthApp.props",
+      "PackagePath": "build\\HealthApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0-android\\staticwebassets\\msbuild.buildMultiTargeting.HealthApp.props",
+      "PackagePath": "buildMultiTargeting\\HealthApp.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0-android\\staticwebassets\\msbuild.buildTransitive.HealthApp.props",
+      "PackagePath": "buildTransitive\\HealthApp.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,0 +1,141 @@
+﻿@page "/"
+@using HealthApp.Components.Data
+@using HealthApp.Components.Pages
+
+<div class="content-padding" >
+<h2>
+	Health App
+</h2>
+<ul>
+	<h3>Welcome to your health app. </h3> 
+</ul>
+
+<ul>
+	@if (load)
+	{
+		<p><em>Loading...</em></p>
+	}
+	else
+	{
+		<h6>
+			Your BMI:
+				<em> @StringForBMI()</em>
+		</h6>
+		<h6>
+			Your TDEE (Total Daily Energy Expenditure):
+			@if (MPService.TDEE == null) { <em> Please insert personal data. </em> }
+			else {@MPService.TDEE }
+		</h6>
+	
+		<ProgressBar Target="Calorie" TargetString="@CaloreTargetString()" Value="EnergyValue()" Max="GoalService.CalTargetNum()" />
+		<ProgressBar Target="Pro" TargetString="@ProTargetString()" Value="ProValue()" Max="GoalService.ProTargetNum()" />
+		<ProgressBar Target="Water" TargetString="@WaterTargetString()" Value="NumGlassOfWater()" Max=8 />
+		<em></em>
+	
+		@if (MPService.MyBloodPressure || MPService.MyDiabetes)
+		{
+			<h6> recommendations: </h6>
+				<h6>	Physical activity:
+					<em> @MPService.RecommendationsString("PhysicalActivity") </em>
+				</h6>
+				<h6>  Nutrition:<em> prefer @MPService.RecommendationsString("dietPrefer")</em>	
+					<em> reduce @MPService.RecommendationsString("dietReduce") </em>
+				</h6>
+				<h6>Additional recommendations:
+					<em> @MPService.RecommendationsString("Additional")</em>
+				</h6>
+		}
+	}
+
+		
+			<button @onclick="Save"> Save All</button>
+</ul>
+
+</div>
+
+@code {
+	FoodService FService = FoodService.INSTANCE;
+	FoodTodayService FTService = FoodTodayService.INSTANCE;
+	GoalService GService = GoalService.INSTANCE;
+	MyProfileService MPService = MyProfileService.INSTANCE;
+	//public static FoodService FService { get; set; } = new FoodService("foodItems");
+	//public static FoodTodayService FTService { get; set; } = new FoodTodayService("foodsToday");
+	//public static GoalService GService = new GoalService("goals");
+	//public static MyProfileService MPService = new MyProfileService("myProfile");
+	bool load = true;
+	protected override async Task OnInitializedAsync()  //loding the valu that saved in the laste time
+	{
+		await base.OnInitializedAsync();
+		await LoadItems();
+		// FTService.LoadItems();
+		// MPService.LoadItems();
+		// GService.LoadItems();
+		// load = false;
+		EventRegistration();
+		StateHasChanged();
+	}
+	void EventRegistration()
+	{
+		FTService.OnChange += UpdateState;
+		GService.OnChange += UpdateState;
+		MPService.OnChange += UpdateState;
+		//FTList = FTService.FoodsToday;
+	}
+	async Task LoadItems()
+	{
+		await FService.LoadItems();
+		FTService.LoadItems();
+		MPService.LoadItems();
+		GService.LoadItems();
+		load = false;
+
+	}
+	private void UpdateState()
+	{
+		//FTList = FTService.FoodsToday;
+		InvokeAsync(StateHasChanged);
+	}
+	public void Dispose()
+	{
+		FTService.OnChange -= UpdateState; 
+		MPService.OnChange -= UpdateState; 
+		GService.OnChange -= UpdateState; 
+	}
+	string StringForBMI()
+	{
+		if (MPService.BMI == null)
+		{
+			return "Please insert personal data.";
+		}
+		else
+		{
+			return MyService<MyProfileService>.MyRound((double)MPService.BMI).ToString()
+			+ MPService.MeaningOfBMI();
+		}
+	}
+	string CaloreTargetString()
+	{
+		return GService.CalculateAndGetTargetString(MPService.TDEE,
+			EnergyValue(), GService.CalTargetData);
+	}
+	string ProTargetString()
+	{
+		return GService.CalculateAndGetTargetString(MPService.Weight(),
+			ProValue(), GService.ProTargetData);
+	}
+	string WaterTargetString()
+	{
+		return "You drank " + NumGlassOfWater() + " of your daily target of 8 glasses";
+	}
+	int NumGlassOfWater() => FTService.NumGlassBeforNumOfDays(0);
+	double EnergyValue() => FTService.TotalValuesBeforNumOfDays(0).totalEnergy;
+	double ProValue() => FTService.TotalValuesBeforNumOfDays(0).totalPro;
+//	public void Refresh(){} // is work only if do sumthing in the page/ even if its nothing
+	void Save()
+	{
+		FTService.SaveItems();
+		FService.SaveItems();
+		MPService.SaveItems();
+		GService.Save(); // for the messege save secsses
+	}
+}

@@ -1,0 +1,42 @@
+﻿@page "/foodsList"
+@using HealthApp.Components.Data
+
+@inject IConnectivity ConnectivityService
+<div class="content-padding">
+<h3>Foods list</h3>
+<ul>
+	 <h5 click for show values per 100 gram/>
+	 <p/>
+	<button @onclick="AddEatItem"> Add new food </button>
+	<AddFood IsOpen="@IsModalOpen" IsOpenChanged="HandleModalStateChanged"/>
+	<br />
+	<input type="text" @bind="SearchFood" placeholder="Search..." />	
+	<br />
+	@foreach (var food in FilteredFoodItems)
+	{
+		<em @onclick="() => ShowDetails(food)">
+			@food.Name
+		</em>
+		<br />
+	}
+</ul>
+</div>
+
+@code {
+	private bool IsModalOpen = false;
+	FoodService FService = FoodService.INSTANCE;
+	//FoodService FService = Home.FService;
+	private string SearchFood = string.Empty;
+	private IEnumerable<FoodItem> FilteredFoodItems => FService.Foods
+			.Where(item => item.Name.Contains(SearchFood, StringComparison.OrdinalIgnoreCase))
+			.ToList();
+
+	async void ShowDetails(FoodItem food)
+	{
+		await Application.Current.MainPage.DisplayAlert(FoodTitleForAmount(food), FoodDetailsString(food), "OK");
+	}
+	string FoodTitleForAmount(FoodItem food) => FService.FoodTitleForAmount(new FoodToday(food.Id, 100));
+	string FoodDetailsString(FoodItem food) => FService.FoodDetailsString(new FoodToday(food.Id, 100));
+	private void AddEatItem() => IsModalOpen = true;
+	private void HandleModalStateChanged(bool value) =>	IsModalOpen = value;
+}

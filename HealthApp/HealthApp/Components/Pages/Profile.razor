@@ -1,0 +1,144 @@
+﻿@page "/Profile"
+@using HealthApp.Components.Data
+
+<div class="content-padding">
+<h3>Your profile</h3>
+
+	@if (MPService.MyValues == null)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<ul>
+	<h6> Please enter your personal information </h6>
+	
+		@foreach (var value in MPService.MyValues)	
+		{
+			<em>
+				@value.Name :
+					<input type="text" placeholder="@GetStringOfMV(value)"
+					   value="@value.Num"
+					   @oninput="(e) => { value.Num = ToStringOrNull(e); SaveItems(); }" />
+			</em>
+			<br />
+		}
+	 </ul>
+
+	 <ul>
+		
+			<h6>	Gender: </h6> 
+			@foreach(string gendr in Genders)
+			{
+				if (isMyGenger(gendr))
+				{
+					<input type="radio"
+					id=@gendr
+					name="gender"
+					checked
+					@onchange="@(() => OnChangeGender(gendr))"
+					/>
+				}
+				else
+				{
+					<input type="radio"
+				   id=@gendr
+				   name="gender"
+				   @onchange="@(() => OnChangeGender(gendr))"
+				   />
+				}
+				<em>
+					<label for=@gendr style="margin-right: 20px;">@gendr</label>
+				</em>
+				
+			}
+
+		<br />
+		<br />
+
+			<h6> Activity: </h6>
+			@foreach(var activ in MPService.Activitys)
+			{
+				if (isMyActivity(activ))
+				{
+					<input type="radio"
+					id=@activ
+					name="activity "
+					checked
+					@onchange="@(() => OnChangeActivity(activ))"
+					/>
+				}
+				else
+				{
+					<input type="radio"
+				   id=@activ
+				   name="activity"
+				   @onchange="@(() => OnChangeActivity(activ))"
+				   />
+				}
+				<em>
+					<label for=@activ style="margin-right: 20px;">@activ</label>
+
+			  </em>
+			 @if(CheckNewLine()){ <br /> }
+			}
+		
+			<br />
+	
+		<input type="checkbox" @bind="MPService.MyDiabetes" id="diabetes" name="diabetes" />
+			<em><label for="diabetes">Diabetes </label> </em>
+		<br />
+		<input type="checkbox" @bind="MPService.MyBloodPressure" id="bloodPressure" name="bloodPressure" />
+		<em> <label for="bloodPressure">
+					 Blood Pressure
+				</label>
+			</em>
+		<br />
+
+	</ul>
+}
+</div>
+
+@code {
+
+	MyProfileService MPService = MyProfileService.INSTANCE;
+	int NewLine = 0;
+	//string? ActivityString;
+	string[] Genders = { MyProfileService.MALE_S, MyProfileService.FEMALE_S };
+	void OnChangeGender(string gender)
+	{
+		MPService.UpdateGender(gender);
+		SaveItems();
+	}
+	bool isMyGenger(string gender) => MPService.IsMyGenger(gender);
+	bool CheckNewLine() => (NewLine % 2 == 0);
+	bool isMyActivity(MyProfileService.Activity activity)
+	{
+		NewLine++;
+		return MPService.IsMyActivity(activity);
+	}
+	string GetStringOfMV(MyValue pD) => pD.Name + " in " + pD.Units;	
+	void OnChangeActivity(MyProfileService.Activity activity)
+	{
+		MPService.UpdateActivity(activity);
+		SaveItems();
+	}
+	//void Save() => MPService.Save();
+	void SaveItems() => MPService.SaveItems();
+	int? ToStringOrNull(ChangeEventArgs e)
+	{
+		try
+		{
+			object? valu = e.Value;
+			return MyService<MyProfileService>.StringToIntOrNull(valu);
+		}
+		catch
+		{
+			return null;
+		}
+
+	}
+	
+}
+
+
